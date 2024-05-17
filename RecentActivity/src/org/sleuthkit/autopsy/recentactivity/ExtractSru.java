@@ -62,10 +62,8 @@ final class ExtractSru extends Extract {
     private static final String APPLICATION_USAGE_SOURCE_NAME = "System Resource Usage - Application Usage"; //NON-NLS
     private static final String NETWORK_USAGE_SOURCE_NAME = "System Resource Usage - Network Usage";
     private static final String SRU_TOOL_FOLDER = "markmckinnon"; //NON-NLS
-    private static final String SRU_TOOL_NAME_WINDOWS_32 = "Export_Srudb_32.exe"; //NON-NLS
-    private static final String SRU_TOOL_NAME_WINDOWS_64 = "Export_Srudb_64.exe"; //NON-NLS
+    private static final String SRU_TOOL_NAME_WINDOWS = "Export_Srudb.exe"; //NON-NLS
     private static final String SRU_TOOL_NAME_LINUX = "Export_Srudb_Linux.exe"; //NON-NLS
-    private static final String SRU_TOOL_NAME_MAC = "Export_srudb_macos"; //NON-NLS
     private static final String SRU_OUTPUT_FILE_NAME = "Output.txt"; //NON-NLS
     private static final String SRU_ERROR_FILE_NAME = "Error.txt"; //NON-NLS
 
@@ -239,8 +237,11 @@ final class ExtractSru extends Extract {
 
         List<String> commandLine = new ArrayList<>();
         commandLine.add(sruExePath);
+        commandLine.add("-sr");
         commandLine.add(sruFile);  //NON-NLS
+        commandLine.add("-s");
         commandLine.add(softwareHiveFile);
+        commandLine.add("-db");
         commandLine.add(tempOutFile);
 
         ProcessBuilder processBuilder = new ProcessBuilder(commandLine);
@@ -253,17 +254,10 @@ final class ExtractSru extends Extract {
     private String getPathForSruDumper() {
         Path path = null;
         if (PlatformUtil.isWindowsOS()) {
-            if (PlatformUtil.is64BitOS()) {
-                path = Paths.get(SRU_TOOL_FOLDER, SRU_TOOL_NAME_WINDOWS_64);
-            } else {
-                path = Paths.get(SRU_TOOL_FOLDER, SRU_TOOL_NAME_WINDOWS_32);
-            }
+            path = Paths.get(SRU_TOOL_FOLDER, SRU_TOOL_NAME_WINDOWS);
         } else {
             if ("Linux".equals(PlatformUtil.getOSName())) {
                 path = Paths.get(SRU_TOOL_FOLDER, SRU_TOOL_NAME_LINUX);
-            } else {
-                path = Paths.get(SRU_TOOL_FOLDER, SRU_TOOL_NAME_MAC);
-            }
         }
         File sruToolFile = InstalledFileLocator.getDefault().locate(path.toString(),
                 ExtractSru.class.getPackage().getName(), false);
@@ -320,7 +314,7 @@ final class ExtractSru extends Extract {
     }
 
     private void createNetUsageArtifacts(String sruDb, AbstractFile sruAbstractFile) {
-        List<BlackboardArtifact> bba = new ArrayList<>();
+         List<BlackboardArtifact> bba = new ArrayList<>();
 
         String sqlStatement = "SELECT STRFTIME('%s', timestamp) ExecutionTime, a.application_name, b.Application_Name formatted_application_name, User_Name, "
                 + " bytesSent, BytesRecvd FROM network_Usage a, SruDbIdMapTable, exe_to_app b "

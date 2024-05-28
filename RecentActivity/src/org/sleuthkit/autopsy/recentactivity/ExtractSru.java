@@ -258,6 +258,7 @@ final class ExtractSru extends Extract {
         } else {
             if ("Linux".equals(PlatformUtil.getOSName())) {
                 path = Paths.get(SRU_TOOL_FOLDER, SRU_TOOL_NAME_LINUX);
+            }
         }
         File sruToolFile = InstalledFileLocator.getDefault().locate(path.toString(),
                 ExtractSru.class.getPackage().getName(), false);
@@ -316,9 +317,11 @@ final class ExtractSru extends Extract {
     private void createNetUsageArtifacts(String sruDb, AbstractFile sruAbstractFile) {
          List<BlackboardArtifact> bba = new ArrayList<>();
 
-        String sqlStatement = "SELECT STRFTIME('%s', timestamp) ExecutionTime, a.application_name, b.Application_Name formatted_application_name, User_Name, "
-                + " bytesSent, BytesRecvd FROM network_Usage a, SruDbIdMapTable, exe_to_app b "
-                + " where appId = IdIndex and IdType = 0 and a.application_name = b.source_name order by ExecutionTime;"; //NON-NLS
+        String sqlStatement = "SELECT STRFTIME('%s', timestamp) ExecutionTime, b.application_name, b.Application_Name formatted_application_name, username User_Name, \n" +
+                              "       bytesSent, BytesRecvd \n" +
+                              "  FROM network_Usage a, SruDbIdMapTable s, exe_to_app b, userNames u\n" +
+                              " WHERE s.idType = 0 and s.idIndex = appId and idblob = b.source_name and u.idindex = userid \n" +
+                              " order by ExecutionTime;"; //NON-NLS
 
         try (SQLiteDBConnect tempdbconnect = new SQLiteDBConnect("org.sqlite.JDBC", "jdbc:sqlite:" + sruDb); //NON-NLS
                 ResultSet resultSet = tempdbconnect.executeQry(sqlStatement)) {
@@ -378,9 +381,11 @@ final class ExtractSru extends Extract {
     private void createAppUsageArtifacts(String sruDb, AbstractFile sruAbstractFile) {
         List<BlackboardArtifact> bba = new ArrayList<>();
 
-        String sqlStatement = "SELECT STRFTIME('%s', timestamp) ExecutionTime, a.application_name, b.Application_Name formatted_application_name, User_Name "
-                + " FROM Application_Resource_Usage a, SruDbIdMapTable, exe_to_app b WHERE "
-                + " idType = 0 and idIndex = appId and a.application_name = b.source_name order by ExecutionTime;"; //NON-NLS
+        String sqlStatement = "SELECT STRFTIME('%s', timestamp) ExecutionTime, b.Application_Name \n" +
+                              "       formatted_application_name, username User_Name \n" +
+                              "  FROM Application_Resource_Usage a, SruDbIdMapTable s, exe_to_app b, userNames u \n" +
+                              " WHERE s.idType = 0 and s.idIndex = appId and idblob = b.source_name and u.idindex = userid \n" +
+                              " order by ExecutionTime;"; //NON-NLS
 
         try (SQLiteDBConnect tempdbconnect = new SQLiteDBConnect("org.sqlite.JDBC", "jdbc:sqlite:" + sruDb); //NON-NLS
                 ResultSet resultSet = tempdbconnect.executeQry(sqlStatement)) {

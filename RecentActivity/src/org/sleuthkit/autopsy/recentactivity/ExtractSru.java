@@ -397,7 +397,6 @@ final class ExtractSru extends Extract {
                     return;
                 }
 
-                String applicationName = resultSet.getString("Application_Name"); //NON-NLS
                 String formattedApplicationName = resultSet.getString("formatted_application_name");
                 Long executionTime = Long.valueOf(resultSet.getInt("ExecutionTime")); //NON-NLS
                 String userName = resultSet.getString("User_Name");
@@ -418,7 +417,7 @@ final class ExtractSru extends Extract {
                 try {
                     BlackboardArtifact bbart = createArtifactWithAttributes(BlackboardArtifact.Type.TSK_PROG_RUN, sruAbstractFile, bbattributes);
                     bba.add(bbart);
-                    BlackboardArtifact associateBbArtifact = createAssociatedArtifact(applicationName.toLowerCase(), bbart);
+                    BlackboardArtifact associateBbArtifact = createAssociatedArtifact(formattedApplicationName.toLowerCase(), bbart);
                     if (associateBbArtifact != null) {
                         bba.add(associateBbArtifact);
                     }

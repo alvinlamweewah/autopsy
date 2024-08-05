@@ -70,7 +70,6 @@ final class ExtractPrefetch extends Extract {
     private static final String PREFETCH_FILE_LOCATION = "/windows/prefetch";
     private static final String PREFETCH_TOOL_FOLDER = "markmckinnon"; //NON-NLS
     private static final String PREFETCH_TOOL_NAME_WINDOWS = "parse_prefetch.exe"; //NON-NLS
-    private static final String PREFETCH_TOOL_NAME_MACOS = "parse_prefetch_macos"; //NON-NLS
     private static final String PREFETCH_TOOL_NAME_LINUX = "parse_prefetch_linux"; //NON-NLS
     private static final String PREFETCH_OUTPUT_FILE_NAME = "Output.txt"; //NON-NLS
     private static final String PREFETCH_ERROR_FILE_NAME = "Error.txt"; //NON-NLS
@@ -221,8 +220,6 @@ final class ExtractPrefetch extends Extract {
         } else {
             if ("Linux".equals(PlatformUtil.getOSName())) {
                 path = Paths.get(PREFETCH_TOOL_FOLDER, PREFETCH_TOOL_NAME_LINUX);
-            } else {
-                path = Paths.get(PREFETCH_TOOL_FOLDER, PREFETCH_TOOL_NAME_MACOS);
             }
         }
         File prefetchToolFile = InstalledFileLocator.getDefault().locate(path.toString(),
